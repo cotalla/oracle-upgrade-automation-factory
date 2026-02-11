@@ -1,0 +1,185 @@
+﻿AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Oracle Upgrade Factory (Deterministic + Step Functions + Bedrock)
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 120
+    MemorySize: 1024
+    Tracing: Active
+
+Parameters:
+  ArtifactBucketName:
+    Type: String
+    Default: oracle-migration-artifacts-448792658038
+
+  DefaultBedrockModelId:
+    Type: String
+    Default: anthropic.claude-3-5-sonnet-20240620-v1:0
+
+Resources:
+  DeterministicSummarizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-deterministic-summarizer'
+      CodeUri: lambdas/deterministic/
+      Handler: app.lambda_handler
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref ArtifactBucketName
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref ArtifactBucketName
+
+  ExtractSectionsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-extract-sections'
+      CodeUri: lambdas/extract_sections/
+      Handler: index.handler
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref ArtifactBucketName
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref ArtifactBucketName
+
+  BedrockGenerateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-bedrock-generate'
+      CodeUri: lambdas/bedrock_generate/
+      Handler: index.handler
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref ArtifactBucketName
+          DEFAULT_MODEL_ID: !Ref DefaultBedrockModelId
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref ArtifactBucketName
+        - Statement:
+            Effect: Allow
+            Action:
+              - bedrock:InvokeModel
+            Resource: '*'
+
+  OracleUpgradeFactoryStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub '${AWS::StackName}-oracle-upgrade-factory'
+      Type: STANDARD
+      DefinitionSubstitutions:
+        DeterministicSummarizerArn: !GetAtt DeterministicSummarizerFunction.Arn
+        ExtractSectionsArn: !GetAtt ExtractSectionsFunction.Arn
+        BedrockGenerateArn: !GetAtt BedrockGenerateFunction.Arn
+      Definition:
+        Comment: "Oracle upgrade factory: deterministic parsing + Bedrock outputs"
+        StartAt: DeterministicSummarize
+        States:
+          DeterministicSummarize:
+            Type: Task
+            Resource: arn:aws:states:::lambda:invoke
+            Parameters:
+              FunctionName: "${DeterministicSummarizerArn}"
+              Payload:
+                bucket.$: $.bucket
+                key.$: $.key
+            ResultPath: $.det
+            Next: ParallelOutputs
+
+          ParallelOutputs:
+            Type: Parallel
+            Branches:
+              - StartAt: ExtractKeySections
+                States:
+                  ExtractKeySections:
+                    Type: Task
+                    Resource: arn:aws:states:::lambda:invoke
+                    Parameters:
+                      FunctionName: "${ExtractSectionsArn}"
+                      Payload:
+                        bucket.$: $.det.Payload.bucket
+                        run_prefix.$: $.det.Payload.run_prefix
+                        executive_report_key.$: $.det.Payload.executive_report_key
+                    End: true
+
+              - StartAt: GenAIExecutive
+                States:
+                  GenAIExecutive:
+                    Type: Task
+                    Resource: arn:aws:states:::lambda:invoke
+                    Parameters:
+                      FunctionName: "${BedrockGenerateArn}"
+                      Payload:
+                        bucket.$: $.det.Payload.bucket
+                        model_id.$: $.model_id
+                        prompt_name: exec_report
+                        evidence_key.$: $.det.Payload.sanitized_summary_key
+                        output_key.$: States.Format('{}/07-genai/executive_report_genai.md', $.det.Payload.run_prefix)
+                    End: true
+
+              - StartAt: GenAIRunbook
+                States:
+                  GenAIRunbook:
+                    Type: Task
+                    Resource: arn:aws:states:::lambda:invoke
+                    Parameters:
+                      FunctionName: "${BedrockGenerateArn}"
+                      Payload:
+                        bucket.$: $.det.Payload.bucket
+                        model_id.$: $.model_id
+                        prompt_name: runbook
+                        evidence_key.$: $.det.Payload.sanitized_summary_key
+                        output_key.$: States.Format('{}/07-genai/runbook.md', $.det.Payload.run_prefix)
+                    End: true
+
+              - StartAt: GenAIRemediation
+                States:
+                  GenAIRemediation:
+                    Type: Task
+                    Resource: arn:aws:states:::lambda:invoke
+                    Parameters:
+                      FunctionName: "${BedrockGenerateArn}"
+                      Payload:
+                        bucket.$: $.det.Payload.bucket
+                        model_id.$: $.model_id
+                        prompt_name: remediation
+                        evidence_key.$: $.det.Payload.sanitized_summary_key
+                        output_key.$: States.Format('{}/07-genai/remediation.sql', $.det.Payload.run_prefix)
+                    End: true
+
+            End: true
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref DeterministicSummarizerFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ExtractSectionsFunction
+        - LambdaInvokePolicy:
+            FunctionName: !Ref BedrockGenerateFunction
+
+  TriggerStartStateMachineFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-trigger-start-sfn'
+      CodeUri: lambdas/trigger_start_sfn/
+      Handler: index.handler
+      Environment:
+        Variables:
+          STATE_MACHINE_ARN: !Ref OracleUpgradeFactoryStateMachine
+          DEFAULT_MODEL_ID: !Ref DefaultBedrockModelId
+      Policies:
+        - Statement:
+            Effect: Allow
+            Action:
+              - states:StartExecution
+            Resource: !Ref OracleUpgradeFactoryStateMachine
+
+Outputs:
+  StateMachineArn:
+    Description: State Machine ARN
+    Value: !Ref OracleUpgradeFactoryStateMachine
+
+  TriggerLambdaName:
+    Description: Trigger Lambda Logical Name
+    Value: !Ref TriggerStartStateMachineFunction

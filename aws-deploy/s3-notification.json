@@ -1,0 +1,17 @@
+{
+  "LambdaFunctionConfigurations": [
+    {
+      "Id": "TriggerOracleUpgradeAnalysisOnMetrics",
+      "LambdaFunctionArn": "arn:aws:lambda:us-east-1:448792658038:function:oracle-upgrade-analysis",
+      "Events": ["s3:ObjectCreated:*"],
+      "Filter": {
+        "Key": {
+          "FilterRules": [
+            { "Name": "prefix", "Value": "runs/" },
+            { "Name": "suffix", "Value": "/00-metadata/metrics.json" }
+          ]
+        }
+      }
+    }
+  ]
+}

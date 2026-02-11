@@ -1,0 +1,26 @@
+﻿GENAI-ASSISTED ORACLE MIGRATION REPORT
+=====================================
+
+Project: Oracle 18c XE → Oracle 23c migration
+Cloud: AWS Lambda + Amazon Bedrock (GenAI analysis)
+Region: us-east-1
+
+Artifacts analyzed:
+- precheck.log
+- expdp_legacy_18c.log
+- impdp_legacy_23c_retry2.log
+- validation_23c.log
+
+Key findings:
+- Migration completed; schema LEGACY_APP present on target.
+- Row-count validation succeeded (ORDERS = 50000).
+- One intentionally invalid object detected post-migration: LEGACY_APP.BAD_VIEW (expected upgrade pain).
+
+Recommendations:
+- Recompile invalid objects (utlrp.sql) and refactor invalid view dependencies.
+- Validate application SQL compatibility for Oracle 23c.
+- Run post-migration regression tests and performance checks.
+
+Status: SUCCESS with minor remediation required.
+
+Generated as GenAI evidence artifact for portfolio.

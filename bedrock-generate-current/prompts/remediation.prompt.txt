@@ -1,0 +1,15 @@
+﻿Output SQL text.
+
+First lines must be:
+-- REVIEW REQUIRED. Generated suggestions only.
+-- Use ONLY evidence JSON; do not invent schema/object names not present.
+
+Then include:
+- Evidence-derived issues summary
+- Suggested safe remediation steps (e.g., recompilation guidance)
+- If ORA-39082 objects are present, list them and suggest how to inspect/compile
+- Placeholders where evidence is missing
+
+Constraints:
+- Use only EVIDENCE_JSON.
+- Avoid destructive operations.

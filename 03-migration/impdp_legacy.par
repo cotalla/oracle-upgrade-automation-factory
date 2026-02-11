@@ -1,0 +1,5 @@
+userid='sys/Welcome123@FREEPDB1 as sysdba'
+schemas=LEGACY_APP
+directory=DATA_PUMP_DIR
+dumpfile=legacy_app_18c.dmp
+logfile=impdp_legacy_23c_retry2.log

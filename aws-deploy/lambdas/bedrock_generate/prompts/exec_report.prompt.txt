@@ -1,0 +1,16 @@
+﻿Generate an executive summary for an Oracle 18c -> 23ai migration/upgrade.
+
+Output Markdown.
+
+Sections:
+1) Executive Summary
+2) Run Overview (environment, status)
+3) Deterministic Risk Summary (score, level, top factors)
+4) Evidence-based findings (ORA taxonomy, ORA-39082 compilation warnings, validation proof)
+5) Recommended next actions (prioritized, safe first)
+6) Governance / Guardrails
+
+Constraints:
+- Use only EVIDENCE_JSON.
+- Do not fabricate results or metrics.
+- Cite JSON keys used (example: risk.score, validation.invalid_objects_count).

@@ -1,0 +1,5 @@
+userid='/ as sysdba'
+schemas=LEGACY_APP
+directory=DATA_PUMP_DIR
+dumpfile=legacy_app_18c.dmp
+logfile=expdp_legacy_18c.log

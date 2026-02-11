@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CloudWatchLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "S3ReadRuns",
+      "Effect": "Allow",
+      "Action": [ "s3:GetObject", "s3:ListBucket" ],
+      "Resource": [
+        "arn:aws:s3:::oracle-migration-artifacts-448792658038",
+        "arn:aws:s3:::oracle-migration-artifacts-448792658038/runs/*"
+      ]
+    },
+    {
+      "Sid": "S3WriteMetadataAndReports",
+      "Effect": "Allow",
+      "Action": [ "s3:PutObject" ],
+      "Resource": [
+        "arn:aws:s3:::oracle-migration-artifacts-448792658038/runs/*/00-metadata/*",
+        "arn:aws:s3:::oracle-migration-artifacts-448792658038/runs/*/05-reports/*"
+      ]
+    },
+    {
+      "Sid": "BedrockInvoke",
+      "Effect": "Allow",
+      "Action": [ "bedrock:InvokeModel" ],
+      "Resource": "*"
+    }
+  ]
+}

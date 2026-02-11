@@ -1,0 +1,3 @@
+OWNER       OBJECT_NAME   OBJECT_TYPE   STATUS
+----------  ------------  ------------  -------
+LEGACY_APP  BAD_VIEW      VIEW          INVALID

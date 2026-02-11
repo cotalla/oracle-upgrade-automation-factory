@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.5.0",
+  "run": {
+    "aws_region": "us-east-1",
+    "environment": "local-docker-windows",
+    "run_prefix": "runs/2026-02-10/",
+    "s3_bucket": "oracle-migration-artifacts-448792658038",
+    "created_utc": "2026-02-11T08:30:52.3753723Z",
+    "run_id": "2026-02-10T083050Z_18c_to_23ai"
+  },
+  "trigger": {
+    "bucket": "oracle-migration-artifacts-448792658038",
+    "key": "runs/2026-02-10/00-metadata/metrics.json"
+  },
+  "derived": {
+    "run_prefix": "runs/2026-02-10/",
+    "selected_impdp_log": "03-migration/impdp_legacy_23c_retry2.log"
+  },
+  "artifact_inventory": {
+    "total_bytes": 1204602,
+    "object_count": 22,
+    "counts_by_extension": [
+      {
+        "count": 8,
+        "ext": ".log"
+      },
+      {
+        "count": 8,
+        "ext": ".sql"
+      },
+      {
+        "count": 2,
+        "ext": ".par"
+      },
+      {
+        "count": 2,
+        "ext": ".txt"
+      },
+      {
+        "count": 1,
+        "ext": ".json"
+      },
+      {
+        "count": 1,
+        "ext": ".dmp"
+      }
+    ]
+  },
+  "log_presence": {
+    "02-precheck/precheck.log": true,
+    "03-migration/expdp_legacy_18c.log": true,
+    "04-validation/validation_23c.log": true,
+    "03-migration/impdp_legacy_23c_retry2.log": true
+  },
+  "ora_counts_by_file": {
+    "02-precheck/precheck.log": {},
+    "03-migration/expdp_legacy_18c.log": {
+      "ORA-31642": 2,
+      "ORA-06512": 14,
+      "ORA-06550": 4,
+      "ORA-39127": 2,
+      "ORA-44002": 2
+    },
+    "04-validation/validation_23c.log": {},
+    "03-migration/impdp_legacy_23c_retry2.log": {
+      "ORA-39082": 1
+    }
+  },
+  "datapump": {
+    "export": {
+      "log": "03-migration/expdp_legacy_18c.log",
+      "status": "WARN",
+      "completion_state": "COMPLETED_WITH_ERRORS",
+      "completed_with_error_count": 2
+    },
+    "import": {
+      "log": "03-migration/impdp_legacy_23c_retry2.log",
+      "status": "WARN",
+      "completion_state": "COMPLETED_WITH_ERRORS",
+      "attempt_count": 2
+    },
+    "impdp_candidates": [
+      {
+        "key": "03-migration/impdp_legacy_23c_retry.log",
+        "base_name": "impdp_legacy_23c_retry.log",
+        "retry_number": 1,
+        "last_modified": "2026-02-10T04:29:57+00:00",
+        "size": 559
+      },
+      {
+        "key": "03-migration/impdp_legacy_23c_retry2.log",
+        "base_name": "impdp_legacy_23c_retry2.log",
+        "retry_number": 2,
+        "last_modified": "2026-02-10T04:29:56+00:00",
+        "size": 1690
+      }
+    ],
+    "selection_reason": "filename_retry_number_then_lastmodified"
+  },
+  "compile_warnings": [
+    {
+      "ora": "ORA-39082",
+      "object_type": "VIEW",
+      "schema": "LEGACY_APP",
+      "object_name": "BAD_VIEW"
+    }
+  ],
+  "validation": {
+    "status": "WARN",
+    "invalid_objects_count": 1,
+    "invalid_objects_sample": [
+      {
+        "owner": "LEGACY_APP",
+        "object_name": "BAD_VIEW",
+        "object_type": "VIEW",
+        "status": "INVALID"
+      }
+    ],
+    "orders_count": 50000,
+    "evidence": {
+      "invalid_object_proof": true,
+      "orders_count_proof": true
+    }
+  },
+  "overall_status": "WARN",
+  "status_reasons": [
+    "Multiple impdp attempts detected (count=2).",
+    "Post-validation indicates WARN conditions (invalid objects present).",
+    "impdp completed with errors."
+  ],
+  "risk": {
+    "score": 60,
+    "level": "MEDIUM",
+    "factors": [
+      {
+        "factor": "impdp_retry_present",
+        "weight": 10,
+        "evidence": "impdp_log_count=2"
+      },
+      {
+        "factor": "warn_ora_present",
+        "weight": 15,
+        "evidence": [
+          "ORA-39082"
+        ]
+      },
+      {
+        "factor": "expdp_completed_with_errors",
+        "weight": 10,
+        "evidence": {
+          "log": "03-migration/expdp_legacy_18c.log",
+          "error_count": 2
+        }
+      },
+      {
+        "factor": "validation_invalid_objects_present",
+        "weight": 25,
+        "evidence": 1
+      }
+    ]
+  },
+  "evidence_excerpts": {},
+  "guardrails": [
+    "No DB connections from AWS.",
+    "No execution of SQL/OS commands.",
+    "Allowlisted log parsing only.",
+    "Bounded reads from S3 objects."
+  ]
+}

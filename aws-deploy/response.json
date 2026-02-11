@@ -1,0 +1,1 @@
+{"errorMessage": "Syntax error in module 'app': unexpected character after line continuation character (app.py, line 50)", "errorType": "Runtime.UserCodeSyntaxError", "requestId": "", "stackTrace": ["  File \"/var/task/app.py\" Line 50\n        prompt = f\\\"\\\"\\\"\n"]}

@@ -1,0 +1,13 @@
+﻿Create an on-prem oriented runbook for Oracle 18c -> 23ai migration/upgrade using Data Pump.
+
+Output Markdown with:
+- Preconditions (approvals, backups, rollback artifacts)
+- Execution steps (export, import, retries policy, logging)
+- Validation steps (invalid objects proof, row-count proof, ORA checks)
+- Rollback plan with checkpoints
+- Known risks pulled from evidence (ORA codes and ORA-39082 objects)
+
+Constraints:
+- Use only EVIDENCE_JSON.
+- If something is missing, write Unknown and keep steps generic/safe.
+- Include explicit "Human approval required" gates for production cutover.

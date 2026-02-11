@@ -1,0 +1,59 @@
+﻿{
+    "schema_version":  "1.0.0",
+    "run":  {
+                "aws_region":  "us-east-1",
+                "environment":  "local-docker-windows",
+                "run_prefix":  "runs/2026-02-10/",
+                "s3_bucket":  "oracle-migration-artifacts-448792658038",
+                "created_utc":  "2026-02-11T08:30:52.3753723Z",
+                "run_id":  "2026-02-10T083050Z_18c_to_23ai"
+            },
+    "artifacts_summary":  {
+                              "total_bytes":  1204602,
+                              "object_count":  22,
+                              "counts_by_extension":  [
+                                                          {
+                                                              "count":  8,
+                                                              "ext":  ".log"
+                                                          },
+                                                          {
+                                                              "count":  8,
+                                                              "ext":  ".sql"
+                                                          },
+                                                          {
+                                                              "count":  2,
+                                                              "ext":  ".par"
+                                                          },
+                                                          {
+                                                              "count":  2,
+                                                              "ext":  ".txt"
+                                                          },
+                                                          {
+                                                              "count":  1,
+                                                              "ext":  ".json"
+                                                          },
+                                                          {
+                                                              "count":  1,
+                                                              "ext":  ".dmp"
+                                                          }
+                                                      ]
+                          },
+    "overall":  {
+                    "status":  "UNKNOWN",
+                    "note":  "Starter metrics generated from existing S3 artifacts; Lambda can enrich by parsing logs."
+                },
+    "phases":  [
+                   {
+                       "name":  "precheck",
+                       "s3_prefix":  "runs/2026-02-10/02-precheck/"
+                   },
+                   {
+                       "name":  "migration",
+                       "s3_prefix":  "runs/2026-02-10/03-migration/"
+                   },
+                   {
+                       "name":  "validation",
+                       "s3_prefix":  "runs/2026-02-10/04-validation/"
+                   }
+               ]
+}

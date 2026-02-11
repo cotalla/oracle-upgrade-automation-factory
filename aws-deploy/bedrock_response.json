@@ -1,0 +1,1 @@
+{"status": "success", "run_id": "2026-02-10", "engine": "fallback", "report_s3": "s3://oracle-migration-artifacts-448792658038/runs/2026-02-10/05-reports/executive_report.md", "metrics_s3": "s3://oracle-migration-artifacts-448792658038/runs/2026-02-10/07-genai/metrics.json"}
