@@ -24,3 +24,5 @@ __pycache__/
 
 # --- Local portfolio media (keep in LinkedIn only) ---
 aws-deploy/linkedin-media/
+
+github-oidc-trust.json
