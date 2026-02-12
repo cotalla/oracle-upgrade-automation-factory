@@ -18,3 +18,9 @@ __pycache__/
 
 # --- Logs ---
 *.log
+# --- Office temp files ---
+~$*.*
+*.tmp
+
+# --- Local portfolio media (keep in LinkedIn only) ---
+aws-deploy/linkedin-media/
