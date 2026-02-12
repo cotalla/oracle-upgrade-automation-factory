@@ -1,15 +1,11 @@
-version = 0.1
-
 [default.deploy.parameters]
 stack_name = "oracle-upgrade-factory"
 resolve_s3 = true
 s3_prefix = "oracle-upgrade-factory"
 region = "us-east-1"
-confirm_changeset = true
+confirm_changeset = false
 capabilities = "CAPABILITY_IAM"
-disable_rollback = true
-parameter_overrides = "ArtifactBucketName=\"oracle-migration-artifacts-448792658038\" DefaultBedrockModelId=\"anthropic.claude-3-5-sonnet-20240620-v1:0\""
+disable_rollback = false
+fail_on_empty_changeset = false
+parameter_overrides = "ArtifactBucketName=\"oracle-migration-artifacts-448792658038\" DefaultBedrockModelId=\"amazon.titan-text-lite-v1\""
 image_repositories = []
-
-[default.global.parameters]
-region = "us-east-1"
