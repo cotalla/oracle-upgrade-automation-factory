@@ -1,0 +1,43 @@
+name: Deploy SAM (Oracle Upgrade Factory)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install SAM CLI
+        run: |
+          pip install aws-sam-cli
+
+      - name: SAM Build
+        run: |
+          cd aws-deploy
+          sam build
+
+      - name: SAM Deploy
+        run: |
+          cd aws-deploy
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
